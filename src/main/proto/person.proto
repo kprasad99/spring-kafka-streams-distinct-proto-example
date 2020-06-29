@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package io.github.kprasad99.kafka.model;
+
+option java_outer_classname = "EventProto";
+option java_package = "io.github.kprasad99.kafka.model";
+
+message Event {
+    string id = 1;
+    string type = 2;
+    string message = 3;
+}

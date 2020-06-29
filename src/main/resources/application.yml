@@ -1,0 +1,47 @@
+spring.cloud.stream:
+#  binders:
+#    kafka:
+#      type: kafka
+#      environment:
+#        spring.cloud.stream.kafka.binder:
+#          brokers: localhost:19092,localhost:29092,localhost:39092
+  kafka:        
+    binder:
+      brokers:
+      - localhost:19092
+      - localhost:29092
+      - localhost:39092
+      producer-properties:
+        key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.serializer: io.github.kprasad99.kafka.serde.KafkaProtobufSerializer
+    bindings:
+      sender-out-0:
+        producer:
+          messageKeyExpression: headers['key']
+  function:
+    definition: sender
+  bindings:
+    sender-out-0:
+      destination: events
+      group: event-sender-group
+      content-type: application/x-protobuf
+      binder: kafka
+      producer:
+        use-native-encoding: true
+        value.serializer: io.github.kprasad99.kafka.serde.KafkaProtobufSerializer
+    distinct-in-0:
+      destination: events
+  kafka.streams.binder:
+        application-id: kp-event-filter-example
+        brokers:
+        - localhost:19092
+        - localhost:29092
+        - localhost:39092
+        replication-factor: 3
+        required-acks: 2
+        min-partition-count: 5
+        configuration:
+          commit.interval.ms: 100
+          default:
+            key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+            value.serde: io.github.kprasad99.kafka.configuration.AppSerdes$ProtobufSerde
